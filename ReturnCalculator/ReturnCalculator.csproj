@@ -19,12 +19,4 @@
         <Link>SharedAssemblyInfo.cs</Link>
       </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <None Remove="Interfaces\" />
-    <None Remove="Calculators\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Calculators\" />
-  </ItemGroup>
 </Project>
