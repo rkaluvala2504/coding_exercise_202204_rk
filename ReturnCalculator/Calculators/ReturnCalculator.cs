@@ -51,7 +51,7 @@ namespace ReturnCalculator
             try
             {
                 decimal mtd = CalculateMTD(period);
-                reportingReturns.Add(CalcTypeEnum.MTD, new PeriodReturns(mtd, "Sucess"));
+                reportingReturns.Add(CalcTypeEnum.MTD, new PeriodReturns(mtd, "Success"));
             }
             catch (Exception ex)
             {
@@ -61,7 +61,7 @@ namespace ReturnCalculator
             try
             {
                 decimal qtd = CalculateQTD(period);
-                reportingReturns.Add(CalcTypeEnum.QTD, new PeriodReturns(qtd, "Sucess"));
+                reportingReturns.Add(CalcTypeEnum.QTD, new PeriodReturns(qtd, "Success"));
             }
             catch (Exception ex)
             {
@@ -71,11 +71,21 @@ namespace ReturnCalculator
             try
             {
                 decimal ytd = CalculateYTD(period);
-                reportingReturns.Add(CalcTypeEnum.YTD, new PeriodReturns(ytd, "Sucess"));
+                reportingReturns.Add(CalcTypeEnum.YTD, new PeriodReturns(ytd, "Success"));
             }
             catch (Exception ex)
             {
                 reportingReturns.Add(CalcTypeEnum.YTD, new PeriodReturns(0, ex.Message));
+            }
+
+            try
+            {
+                decimal oneYearTrail = CalculateOneYearTrail(period);
+                reportingReturns.Add(CalcTypeEnum.OneYearTrail, new PeriodReturns(oneYearTrail, "Success"));
+            }
+            catch (Exception ex)
+            {
+                reportingReturns.Add(CalcTypeEnum.OneYearTrail, new PeriodReturns(0, ex.Message));
             }
 
             return reportingReturns;
@@ -139,7 +149,7 @@ namespace ReturnCalculator
                     4 => 10
                 };
                 
-                qtd = CalculateReturns(period.Month, monthEnd, period.Year);
+                qtd = Calculate(period.Month, monthEnd, period.Year);
                 qtd -= 1;
             }
             catch (Exception)
@@ -160,7 +170,7 @@ namespace ReturnCalculator
             decimal ytd;
             try
             {
-                ytd = CalculateReturns(period.Month, 0,period.Year);
+                ytd = Calculate(period.Month, 0,period.Year);
                 ytd -= 1;
             }
 
@@ -184,20 +194,29 @@ namespace ReturnCalculator
         {
             if (!IsTrailDataAvailable(period))
                 throw new Exception($"One Year trailing Data is not available for Returns Calculation for Period: {period.Month} -{period.Year} ");
-            /*
 
-            Calculations are not clear and I was not able to tie up with sample Data. I will confirm with Summit rocks and work on implementing the changes
-              
-             */ 
-            decimal compoundedReturn = 0;
-            return decimal.Round(compoundedReturn, ReturnsPrecision);
+            int currentMonth = period.Month;
+            int year = period.Year;
+            decimal trailReturns = 1;
+            decimal result;
+            Period newPeriod = period;
+            //Looping through last 12 Months
+            for (int i = 12; i > 0; i--)
+            {  
+                result = CalculateMTD(newPeriod);
+                var returns = 1 + result;
+                trailReturns *= returns;
+                newPeriod = newPeriod.PriorPeriod();
+            }
+            trailReturns -= 1;
+            return decimal.Round(trailReturns, ReturnsPrecision);
+        }
 
-         }
-
-        private bool IsTrailDataAvailable(Period period)
+        private bool IsTrailDataAvailable(Period period, int yearTrail =1)
         {
-            var result = endingMarketValues.Select(mv => mv).Where(mv => mv.Year <= period.Year);
-            return result.Count() >= 12;
+
+            var result = endingMarketValues.Select(mv => mv).Where(mv  => mv.Year <= period.Year);
+            return result.Count() >= yearTrail * 12;
             
         }
 
@@ -207,7 +226,7 @@ namespace ReturnCalculator
         /// <param name="monthStart"></param>
         /// <param name="monthEnd"></param>
         /// <returns></returns>
-        private decimal CalculateReturns(int monthStart, int monthEnd,int year)
+        private decimal Calculate(int monthStart, int monthEnd,int year)
         {
             decimal result = 1;
             decimal mtd = 0;

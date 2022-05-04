@@ -16,7 +16,7 @@ namespace ReturnCalculator
 
         /// <summary>
         /// Calculates All the Returns Needed For Reporting.
-        /// Currently Supports MTD,QTD and YTD
+        /// Currently Supports MTD,QTD ,YTD and 1Year Trail
         /// </summary>
         /// <param name="period"></param>
         /// <returns></returns>

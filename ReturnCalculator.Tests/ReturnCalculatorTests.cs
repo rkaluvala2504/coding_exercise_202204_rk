@@ -68,9 +68,21 @@ namespace ReturnCalculator
 		[Test]
 		public void CalculateOneYearTrailTest()
 		{
-			Period period = Period.From(3, 2021);
-			var ytd = _returnCalculator.CalculateReturns(period, CalcTypeEnum.OneYearTrail);
-			Assert.AreEqual(0, ytd);
+			Period period = Period.From(1, 2021);
+			var yeartrail = _returnCalculator.CalculateReturns(period, CalcTypeEnum.OneYearTrail);
+			Assert.AreEqual(-0.07282, yeartrail);
+
+			period = Period.From(3, 2021);
+			yeartrail = _returnCalculator.CalculateReturns(period, CalcTypeEnum.OneYearTrail);
+			Assert.AreEqual(-0.09861, yeartrail);
+
+			period = Period.From(12, 2020);
+			yeartrail = _returnCalculator.CalculateReturns(period, CalcTypeEnum.OneYearTrail);
+			Assert.AreEqual(-0.02656, yeartrail);
+
+			period = Period.From(11, 2020);
+			yeartrail = _returnCalculator.CalculateReturns(period, CalcTypeEnum.OneYearTrail);
+			Assert.AreEqual(-0.00192, yeartrail);
 		}
 
 		[Test]
@@ -82,6 +94,7 @@ namespace ReturnCalculator
 			Assert.AreEqual(0.01253, result[CalcTypeEnum.MTD].Value);
 			Assert.AreEqual(-0.01979, result[CalcTypeEnum.QTD].Value);
 			Assert.AreEqual(-0.01979, result[CalcTypeEnum.YTD].Value);
+			Assert.AreEqual(-0.09861, result[CalcTypeEnum.OneYearTrail].Value);
 		}
 	}
 }
